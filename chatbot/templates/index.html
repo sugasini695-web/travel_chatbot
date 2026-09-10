@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TravelMate | AI Travel Assistant</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{min-height:100vh;font-family:Inter,system-ui,sans-serif;background:radial-gradient(circle at 15% 15%,#164663 0,transparent 30%),radial-gradient(circle at 85% 85%,#34266b 0,transparent 30%),#07111f;color:#eef6ff;display:flex;align-items:center;justify-content:center;padding:18px}.app{width:min(1050px,100%);height:min(760px,94vh);display:grid;grid-template-columns:290px 1fr;overflow:hidden;border:1px solid #ffffff1c;border-radius:28px;background:#091626d9;backdrop-filter:blur(20px);box-shadow:0 30px 90px #0008}.side{padding:30px 23px;background:linear-gradient(160deg,#17496fbb,#0a1c2dcc);border-right:1px solid #ffffff12;display:flex;flex-direction:column}.brand{display:flex;align-items:center;gap:12px;margin-bottom:35px}.logo{width:48px;height:48px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(135deg,#37d5ff,#7867ff);font-size:24px}.brand h1{font-size:20px}.brand span{font-size:12px;color:#9eb4c9}.label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8ea6bb;margin-bottom:13px}.suggestions{display:grid;gap:10px}.suggestion{border:1px solid #ffffff12;background:#ffffff0b;color:#dce9f5;border-radius:14px;padding:13px;text-align:left;cursor:pointer}.suggestion:hover{background:#ffffff17}.badge{margin-top:auto;padding:14px;border-radius:16px;background:#36d39912;border:1px solid #36d3992b;color:#a8e8cd;font-size:12px;line-height:1.5}.chat{min-width:0;display:flex;flex-direction:column}.top{min-height:82px;display:flex;align-items:center;justify-content:space-between;padding:18px 25px;border-bottom:1px solid #ffffff12}.status{display:flex;align-items:center;gap:10px}.dot{width:9px;height:9px;border-radius:50%;background:#36d399;box-shadow:0 0 14px #36d399}.status strong{display:block;font-size:14px}.status small{color:#849db3}#messages{flex:1;overflow-y:auto;padding:25px}.message{display:flex;gap:11px;margin-bottom:18px}.user{justify-content:flex-end}.avatar{flex:0 0 34px;width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:#ffffff0d}.bubble{max-width:82%;padding:13px 16px;border-radius:17px;line-height:1.55;font-size:14px;white-space:pre-wrap}.bot .bubble{background:#ffffff0b;border:1px solid #ffffff12;border-top-left-radius:5px}.user .bubble{background:linear-gradient(135deg,#236b91,#514e9a);border-top-right-radius:5px}.composer{padding:16px 20px 20px;border-top:1px solid #ffffff12}.input{display:flex;align-items:center;gap:10px;padding:9px 10px 9px 17px;border:1px solid #ffffff21;border-radius:18px;background:#0003}textarea{flex:1;resize:none;height:45px;max-height:120px;border:0;outline:0;color:#eef6ff;background:transparent;font:inherit;padding-top:11px}textarea::placeholder{color:#6f879d}#send{width:44px;height:44px;border:0;border-radius:14px;cursor:pointer;background:linear-gradient(135deg,#39d3ff,#7464ff);color:#fff;font-size:18px}#send:disabled{opacity:.5}.hint{color:#627c92;font-size:10px;text-align:center;margin-top:8px}.typing{opacity:.65}@media(max-width:760px){body{padding:0}.app{height:100vh;border-radius:0;grid-template-columns:1fr}.side{display:none}.top{min-height:70px}#messages{padding:18px 14px}.composer{padding:12px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+<div class="brand"><div class="logo">✈</div><div><h1>TravelMate</h1><span>AI Travel Assistant</span></div></div>
+<div class="label">Try asking</div>
+<div class="suggestions">
+<button class="suggestion">Plan a 3-day trip to Goa</button>
+<button class="suggestion">Best time to visit Japan?</button>
+<button class="suggestion">What should I pack for a hill trip?</button>
+<button class="suggestion">Suggest a budget itinerary for Kerala</button>
+</div>
+<div class="badge">✦ Travel-only assistant<br>Destinations • Itineraries • Transport • Stays • Travel tips</div>
+</aside>
+<main class="chat">
+<header class="top"><div class="status"><span class="dot"></span><div><strong>TravelMate</strong><small>Ready to plan your journey</small></div></div><div>🌍</div></header>
+<section id="messages"><div class="message bot"><div class="avatar">✈</div><div class="bubble">Hi! I'm TravelMate 🌍
+
+I can help with destinations, itineraries, transportation, stays, attractions, seasons, packing and travel tips.
+
+Where would you like to go?</div></div></section>
+<form class="composer" id="chatForm"><div class="input"><textarea id="messageInput" placeholder="Ask a travel question..." rows="1"></textarea><button id="send" type="submit">➤</button></div><div class="hint">Travel information assistant • Verify time-sensitive rules with official sources</div></form>
+</main>
+</div>
+<script>
+const messages=document.getElementById("messages"),form=document.getElementById("chatForm"),input=document.getElementById("messageInput"),send=document.getElementById("send");
+function addMessage(text,role){const w=document.createElement("div");w.className=`message ${role}`;w.innerHTML=role==="bot"?'<div class="avatar">✈</div><div class="bubble"></div>':'<div class="bubble"></div>';w.querySelector(".bubble").textContent=text;messages.appendChild(w);messages.scrollTop=messages.scrollHeight}
+async function sendMessage(text){if(!text.trim()||send.disabled)return;addMessage(text.trim(),"user");input.value="";input.style.height="45px";send.disabled=true;const t=document.createElement("div");t.className="message bot typing";t.innerHTML='<div class="avatar">✈</div><div class="bubble">TravelMate is thinking…</div>';messages.appendChild(t);messages.scrollTop=messages.scrollHeight;try{const r=await fetch("/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:text})});const d=await r.json();t.remove();addMessage(r.ok?d.reply:(d.error||"Something went wrong."),"bot")}catch(e){t.remove();addMessage("Connection error. Please try again.","bot")}finally{send.disabled=false;input.focus()}}
+form.addEventListener("submit",e=>{e.preventDefault();sendMessage(input.value)});
+input.addEventListener("input",()=>{input.style.height="45px";input.style.height=Math.min(input.scrollHeight,120)+"px"});
+input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();form.requestSubmit()}});
+document.querySelectorAll(".suggestion").forEach(b=>b.addEventListener("click",()=>sendMessage(b.textContent)));
+</script>
+</body>
+</html>
